@@ -1,15 +1,38 @@
-#set page(margin: (left: 0.99cm, right: 0.5cm, y: 1.52cm))
+#set page(
+  // paper: "us-letter",
+  margin: (left: 0.99cm, right: 0cm, top: 1.52cm, bottom: 0cm),
+)
 #set par(leading: 0em)
-#set text(font: "Atkinson Hyperlegible", size: 30pt)
-#set text(font: "Alegreya", size: 30pt)
+// #set text(font: "Atkinson Hyperlegible", size: 30pt)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#set text(font: "CommitMono", size: 30pt)
 #{
   let card_width = 63.4mm
   let card_height = 88.9mm
   let card_radius = 3mm
   let cut_guide_length = 1.5mm
-  let suit_scale = 9mm
+  let suit_scale = 7.5mm
   let card_padding_x = 2mm
   let card_padding_y = 2mm
+  let rank_suit_spacing = 2mm
+  let suit_points_spacing = 1mm
+  let text_big = 55pt
+  let text_big2 = 45pt
+  let text_small = 22pt
+  let text_tiny = 9.5pt
 
   let card(
     top_left: [],
@@ -79,26 +102,76 @@
     "animals/001-crow.svg",
     "animals/002-crane.svg",
   )
-
-  grid(
-    columns: 3,
-    for (rank, suit, animal) in ranks.zip(suits * 9, animals * 20) {
-      let elm = align(
-        center,
-        stack(rank, spacing: 3mm, scale(suit_scale, reflow: true, suit)),
-      )
-      card(
-        fill: if suit in (sym.suit.diamond, sym.suit.heart) {
-          red
-        } else {
-          black
-        },
-        top_right: elm,
-        top_left: elm,
-        bottom_right: rotate(180deg, elm),
-        bottom_left: rotate(180deg, elm),
-        center_content: animal,
-      )
-    },
+  let sequence_little = (
+    [0],
+    [1],
+    [2],
+    [3],
+    [4],
+    [5],
+    [6],
+    [7],
+    [8],
+    [9],
   )
+
+  let sequence_big = ((([0],) * 10,) + (([8],) * 10)).flatten()
+  let all_cards = (ranks * 20).zip(
+    (sym.suit.club,) * 20,
+    animals * 20,
+    sequence_big * 20,
+    sequence_little * 20,
+  )
+  let cards_per_page = 9
+
+  let page_of_cards(cards) = {
+    grid(
+      for (rank, suit, animal, s_big, s_little) in cards {
+        let elm = align(
+          left,
+          stack(
+            spacing: suit_points_spacing,
+            align(
+              center,
+              stack(
+                rank,
+                spacing: rank_suit_spacing,
+                scale(suit_scale, reflow: true, suit),
+              ),
+            ),
+            pad(
+              x: 1mm,
+              stack(
+                text(size: text_tiny, $sym.circle.filled$),
+                text(size: text_tiny, $sym.circle.filled$),
+                text(size: text_tiny, $sym.circle.filled$),
+                text(size: text_tiny, $sym.circle.filled$),
+              ),
+            ),
+          ),
+        )
+        card(
+          fill: if suit in (sym.suit.diamond, sym.suit.heart) {
+            red
+          } else {
+            black
+          },
+          top_right: text(size: text_big)[#s_big#s_little],
+          top_left: elm,
+          bottom_right: rotate(180deg, origin: left + top, reflow: true, elm),
+          bottom_left: pad(
+            bottom: 3.5mm,
+            box(
+              smallcaps(text(size: text_big2)[F] + text(size: text_small)[ool]),
+            ),
+          ),
+          center_content: animal,
+        )
+      },
+    )
+  }
+
+  for cards in all_cards.chunks(cards_per_page) {
+    page_of_cards(cards)
+  }
 }
