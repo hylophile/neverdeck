@@ -129,6 +129,7 @@
     "animals/001-crow.svg",
     "animals/002-crane.svg",
   )
+  let names = ("Fool", "Magician", "Priestess")
   let sequence_little = (
     [0],
     [1],
@@ -149,13 +150,16 @@
     animals * 20,
     sequence_big * 20,
     sequence_little * 20,
+    names * 20,
   )
   let cards_per_page = 9
 
   let page_of_cards(cards) = {
     grid(
-      for (rank, suit, points, animal, s_big, s_little) in cards {
+      for (rank, suit, points, animal, s_big, s_little, name) in cards {
         let elm = rank_suit_points_corner(rank, suit, points)
+        let name_initial = name.at(0)
+        let name_rest = name.slice(1)
 
         card(
           fill: if suit in (sym.suit.diamond, sym.suit.heart) {
@@ -169,7 +173,10 @@
           bottom_left: pad(
             bottom: 3.5mm,
             box(
-              smallcaps(text(size: text_big2)[F] + text(size: text_small)[ool]),
+              smallcaps(text(size: text_big2, name_initial) + text(
+                size: text_small,
+                name_rest,
+              )),
             ),
           ),
           center_content: animal,
