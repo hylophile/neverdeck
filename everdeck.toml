@@ -1,0 +1,40 @@
+#:schema ./schema.json
+
+[options]
+font_size_base = "10pt"
+
+[[cards]]
+rank = "7"
+number = "37"
+suit = "sym.suit.club"
+color = "blue"
+points = 5
+name = "Nemo"
+image_file = "animals/000-clownfish.svg"
+
+[[cards]]
+rank = "X"
+number = "1337"
+suit = "sym.suit.heart"
+color = "green"
+points = 3
+name = "Crowley"
+image_file = "animals/001-crow.svg"
+
+[[cards]]
+rank = "2"
+number = "42"
+suit = "sym.suit.diamond"
+color = "red"
+points = 1
+name = "Rooftop"
+image_file = "animals/002-crane.svg"
+
+[[cards]]
+rank = "0"
+number = "89"
+suit = "sym.suit.spade"
+color = "orange"
+points = 4
+name = "Mockingbird"
+image_file = "animals/002-crane.svg"

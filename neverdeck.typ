@@ -12,8 +12,26 @@
 
 
 
+// from https://github.com/typst/typst/issues/682#issuecomment-2252123367
+#let z-stack(..contents) = (
+  context {
+    let max-width = calc.max(
+      ..contents.pos().map(content => {
+        measure(content).width
+      }),
+    )
 
-
+    box(
+      grid(
+        align: center + horizon,
+        columns: contents.pos().len() * (max-width,),
+        column-gutter: -max-width,
+        rows: 1,
+        ..contents
+      ),
+    )
+  }
+)
 
 
 
@@ -68,13 +86,13 @@
         #place(top + right, top_right)
         #place(bottom + right, bottom_right)
         #place(bottom + left, bottom_left)
-        #place(center + horizon, image(center_content))
+        #place(center + horizon, center_content)
       ],
     )
   }
 
   let rank_suit_points_corner(rank, suit, points, color) = {
-    let points_symbol = if suit in (sym.suit.club,) {
+    let points_symbol = if suit in ("sym.suit.club", "sym.suit.heart") {
       sym.circle.filled
     } else {
       sym.diamond.filled
@@ -88,7 +106,11 @@
           stack(
             rank,
             spacing: rank_suit_spacing,
-            scale(suit_scale, reflow: true, text(fill: eval(color), suit)),
+            scale(
+              suit_scale,
+              reflow: true,
+              text(fill: eval(color), eval(suit)),
+            ),
           ),
         ),
         pad(
@@ -139,14 +161,16 @@
   )
   let cards_per_page = 9
 
+
+
   let page_of_cards(cards) = {
     grid(
-      for (rank, suit, color, points, animal, sequence_number, name) in cards {
+      for (rank, suit, color, points, image_file, number, name) in cards {
         let elm = rank_suit_points_corner(rank, suit, points, color)
         let name_initial = name.at(0)
         let name_rest = name.slice(1)
-        let sequence_start = sequence_number.slice(0, -1)
-        let sequence_last = sequence_number.at(-1)
+        let sequence_start = number.slice(0, -1)
+        let sequence_last = number.at(-1)
 
         card(
           top_right: text(size: text_big, sequence_start) + text(
@@ -166,12 +190,21 @@
               )),
             ),
           ),
-          center_content: animal,
+          center_content: z-stack(
+            circle(
+              // fill: eval(color).transparentize(75%),
+              stroke: eval(color) + 2mm,
+              radius: card_width / 2 - 5mm,
+            ),
+            image(image_file),
+          ),
         )
       },
     )
   }
 
+
+  let all_cards = toml("everdeck.toml").cards
   for cards in all_cards.chunks(cards_per_page) {
     page_of_cards(cards)
   }

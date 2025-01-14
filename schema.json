@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Generated schema for Root",
+  "type": "object",
+  "properties": {
+    "cards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "string",
+            "pattern": "^[0-9]+$"
+          },
+          "color": {
+            "type": "string"
+          },
+          "image_file": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "points": {
+            "type": "number"
+          },
+          "rank": {
+            "type": "string",
+            "pattern": "^[0-9XJQKA]$"
+          },
+          "suit": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "number",
+          "color",
+          "image_file",
+          "name",
+          "points",
+          "rank",
+          "suit"
+        ]
+      }
+    },
+    "options": {
+      "type": "object",
+      "properties": {
+        "font_size_base": {
+          "type": "string"
+        }
+      },
+      "required": ["font_size_base"]
+    }
+  },
+  "required": ["cards", "options"]
+}
