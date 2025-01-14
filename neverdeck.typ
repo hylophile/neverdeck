@@ -18,7 +18,9 @@
 
 
 
-#set text(font: "CommitMono", size: 30pt)
+// #set text(font: "CommitMono", size: 30pt)
+#set text(font: "Alegreya", size: 30pt)
+
 #{
   let card_width = 63.4mm
   let card_height = 88.9mm
@@ -74,6 +76,31 @@
     )
   }
 
+  let rank_suit_points_corner(rank, suit, points) = {
+    let points_symbol = if suit in (sym.suit.club,) {
+      sym.circle.filled
+    } else {
+      sym.diamond.filled
+    }
+    align(
+      left,
+      stack(
+        spacing: suit_points_spacing,
+        align(
+          center,
+          stack(
+            rank,
+            spacing: rank_suit_spacing,
+            scale(suit_scale, reflow: true, suit),
+          ),
+        ),
+        pad(
+          x: 1mm,
+          stack(..(text(size: text_tiny, $#points_symbol$),) * points),
+        ),
+      ),
+    )
+  }
   let ranks = (
     [0],
     [1],
@@ -118,6 +145,7 @@
   let sequence_big = ((([0],) * 10,) + (([8],) * 10)).flatten()
   let all_cards = (ranks * 20).zip(
     (sym.suit.club,) * 20,
+    (5, 6, 7) * 200,
     animals * 20,
     sequence_big * 20,
     sequence_little * 20,
@@ -126,30 +154,9 @@
 
   let page_of_cards(cards) = {
     grid(
-      for (rank, suit, animal, s_big, s_little) in cards {
-        let elm = align(
-          left,
-          stack(
-            spacing: suit_points_spacing,
-            align(
-              center,
-              stack(
-                rank,
-                spacing: rank_suit_spacing,
-                scale(suit_scale, reflow: true, suit),
-              ),
-            ),
-            pad(
-              x: 1mm,
-              stack(
-                text(size: text_tiny, $sym.circle.filled$),
-                text(size: text_tiny, $sym.circle.filled$),
-                text(size: text_tiny, $sym.circle.filled$),
-                text(size: text_tiny, $sym.circle.filled$),
-              ),
-            ),
-          ),
-        )
+      for (rank, suit, points, animal, s_big, s_little) in cards {
+        let elm = rank_suit_points_corner(rank, suit, points)
+
         card(
           fill: if suit in (sym.suit.diamond, sym.suit.heart) {
             red
