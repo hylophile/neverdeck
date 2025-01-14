@@ -42,7 +42,6 @@
     bottom_left: [],
     bottom_right: [],
     center_content: [],
-    fill: black,
   ) = {
     box(
       stroke: (
@@ -65,8 +64,6 @@
         ),
       )[
 
-        #set text(fill: fill)
-
         #place(top + left, top_left)
         #place(top + right, top_right)
         #place(bottom + right, bottom_right)
@@ -76,7 +73,7 @@
     )
   }
 
-  let rank_suit_points_corner(rank, suit, points) = {
+  let rank_suit_points_corner(rank, suit, points, color) = {
     let points_symbol = if suit in (sym.suit.club,) {
       sym.circle.filled
     } else {
@@ -91,7 +88,7 @@
           stack(
             rank,
             spacing: rank_suit_spacing,
-            scale(suit_scale, reflow: true, suit),
+            scale(suit_scale, reflow: true, text(fill: eval(color), suit)),
           ),
         ),
         pad(
@@ -130,44 +127,33 @@
     "animals/002-crane.svg",
   )
   let names = ("Fool", "Magician", "Priestess")
-  let sequence_little = (
-    [0],
-    [1],
-    [2],
-    [3],
-    [4],
-    [5],
-    [6],
-    [7],
-    [8],
-    [9],
-  )
+  let sequence_numbers = ("00", "01", "02")
 
-  let sequence_big = ((([0],) * 10,) + (([8],) * 10)).flatten()
   let all_cards = (ranks * 20).zip(
     (sym.suit.club,) * 20,
+    ("red", "blue") * 20,
     (5, 6, 7) * 200,
     animals * 20,
-    sequence_big * 20,
-    sequence_little * 20,
+    sequence_numbers * 20,
     names * 20,
   )
   let cards_per_page = 9
 
   let page_of_cards(cards) = {
     grid(
-      for (rank, suit, points, animal, s_big, s_little, name) in cards {
-        let elm = rank_suit_points_corner(rank, suit, points)
+      for (rank, suit, color, points, animal, sequence_number, name) in cards {
+        let elm = rank_suit_points_corner(rank, suit, points, color)
         let name_initial = name.at(0)
         let name_rest = name.slice(1)
+        let sequence_start = sequence_number.slice(0, -1)
+        let sequence_last = sequence_number.at(-1)
 
         card(
-          fill: if suit in (sym.suit.diamond, sym.suit.heart) {
-            red
-          } else {
-            black
-          },
-          top_right: text(size: text_big)[#s_big#s_little],
+          top_right: text(size: text_big, sequence_start) + text(
+            size: text_big,
+            fill: eval(color),
+            sequence_last,
+          ),
           top_left: elm,
           bottom_right: rotate(180deg, origin: left + top, reflow: true, elm),
           bottom_left: pad(
@@ -175,6 +161,7 @@
             box(
               smallcaps(text(size: text_big2, name_initial) + text(
                 size: text_small,
+                fill: eval(color),
                 name_rest,
               )),
             ),
